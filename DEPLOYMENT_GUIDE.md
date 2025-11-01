@@ -39,11 +39,16 @@
 ## 🎯 Render Deployment (RECOMMENDED - FREE)
 
 ### Why Render?
-✅ Free 750 hours/month (24/7 coverage)
+✅ **750 Free instance hours/month** (enough for 24/7 operation)
 ✅ Easy setup (5 minutes)
 ✅ Auto-deploy on git push
 ✅ HTTPS/SSL included
 ✅ No credit card required
+
+### ⚠️ Key Limitation - Web Services Spin Down
+**Important**: If you deploy as a "Web Service", Render spins it down after 15 minutes of inactivity. **Deploy as a "Background Worker"** instead for 24/7 operation without spin-down!
+
+Reference: [Render Free Tier Documentation](https://render.com/docs/free)
 
 ### Step-by-Step Instructions:
 
@@ -90,8 +95,12 @@ git commit -m "Initial commit for deployment"
 
 #### 4. Deploy on Render
 
-1. **Login to Render Dashboard**
-2. **Click "New +"** → Select "Background Worker"
+1. **Login to Render Dashboard**: https://dashboard.render.com
+
+2. **Click "New +"** → Select **"Background Worker"** ⚠️ IMPORTANT
+   - **DO NOT** choose "Web Service" (it will spin down after 15 min)
+   - Choose "Background Worker" for 24/7 operation
+
 3. **Connect GitHub Repository**
    - Authorize Render to access your GitHub
    - Select your bot repository
@@ -100,8 +109,11 @@ git commit -m "Initial commit for deployment"
    ```
    Name: kakinada-legal-bot
    Environment: Python 3
+   Region: Singapore (closest to India)
+   Branch: main
    Build Command: pip install -r requirements.txt
    Start Command: python bot.py
+   Instance Type: Free
    ```
 
 5. **Add Environment Variables** (Optional - if you move API keys):
@@ -458,6 +470,36 @@ logging.basicConfig(
 2. **Check Memory Usage** - Upgrade plan if needed
 3. **Review Error Logs**
 4. **Test with smaller features first**
+
+### Render-Specific Issues
+
+**"Service Suspended"**
+- **Cause**: Used all 750 Free instance hours for the month
+- **Solution**: 
+  - Wait until next month (hours reset on 1st)
+  - Or upgrade to paid plan ($7/month for 24/7)
+- **Check Usage**: Dashboard → Billing → "Monthly Included Usage"
+
+**Bot Goes Offline After 15 Minutes**
+- **Cause**: Deployed as "Web Service" instead of "Background Worker"
+- **Solution**: 
+  1. Delete current service
+  2. Redeploy as "Background Worker"
+
+**"Build Failed"**
+- **Cause**: Missing dependencies or wrong Python version
+- **Solution**: 
+  - Check `requirements.txt` is complete
+  - Verify `runtime.txt` has `python-3.10.12`
+  - Check build logs for specific error
+
+**"Out of Bandwidth"**
+- **Cause**: Exceeded free tier bandwidth limit
+- **Solution**:
+  - Add payment method (Render charges for extra bandwidth)
+  - Or wait until next month
+
+Reference: [Render Free Tier Documentation](https://render.com/docs/free)
 
 ---
 

@@ -89,12 +89,32 @@ git push -u origin main
 
 Your bot is now running 24/7 for FREE! 🚀
 
-### What Render Gives You:
-- ✅ 750 hours/month free (31 days × 24 hours = 744 hours)
+### What Render Free Tier Gives You:
+- ✅ **750 Free instance hours/month** (enough for 24/7: 31 days × 24 hours = 744 hours)
 - ✅ Auto-restart if bot crashes
 - ✅ Auto-deploy on git push
 - ✅ Real-time logs
 - ✅ No credit card needed
+
+### ⚠️ Important Render Free Tier Limitations:
+
+**1. Spin Down on Idle (Web Services Only)**
+- If you deployed as a **Web Service**, it spins down after 15 minutes of inactivity
+- Spins back up when receiving a request (takes ~30-60 seconds)
+- **Solution**: Deploy as a **Background Worker** instead (doesn't spin down!)
+
+**2. Monthly Limits**
+- 750 Free instance hours per workspace
+- Outbound bandwidth limits apply
+- If exceeded, service suspends until next month
+
+**3. Service May Restart**
+- Render might restart your service at any time
+- Your bot will automatically reconnect when this happens
+
+**4. No Persistent Disk**
+- PDFs are generated temporarily (sent to user immediately)
+- No permanent file storage on free tier
 
 ---
 
