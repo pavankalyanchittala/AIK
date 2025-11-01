@@ -7,19 +7,29 @@ from dotenv import load_dotenv
 # Load environment variables from .env file (for local development)
 load_dotenv()
 
+# ============================================
+# API KEYS - MUST BE SET IN .ENV FILE
+# ============================================
+# NEVER hardcode API keys in this file!
+# All keys are loaded from environment variables only.
+
 # Telegram Bot Configuration
-# Priority: 1. Environment variable, 2. Hardcoded fallback
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8187667435:AAER2q-a06wXtHBCLAGND-X76Q6A85yT6wk")
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+if not TELEGRAM_BOT_TOKEN:
+    raise ValueError("❌ TELEGRAM_BOT_TOKEN not found! Please set it in .env file")
 
 # Gemini API Configuration
-# Priority: 1. Environment variable, 2. Hardcoded fallback
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyB8EG93ctLYzuu2J07TtilNEX4L1BWVOW8")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+if not GEMINI_API_KEY:
+    raise ValueError("❌ GEMINI_API_KEY not found! Please set it in .env file")
+
 GEMINI_MODEL = "gemini-flash-lite-latest"  # Gemini Flash-Lite Latest with Google Search grounding
 GOOGLE_SEARCH_RETRIEVAL = True  # Enable Google Search grounding
 
 # Google Maps API Configuration
-# Priority: 1. Environment variable, 2. Hardcoded fallback
-GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY", "AIzaSyDE9Rj-dBn6LtDCQxGrhVO--uuzl90QpvQ")
+GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
+if not GOOGLE_MAPS_API_KEY:
+    raise ValueError("❌ GOOGLE_MAPS_API_KEY not found! Please set it in .env file")
 
 # Bot Settings
 BOT_USERNAME = "@ai_governance_bot"
