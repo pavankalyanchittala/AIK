@@ -1,17 +1,25 @@
 """
 Configuration file for Kakinada Legal Assistant Bot
 """
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file (for local development)
+load_dotenv()
 
 # Telegram Bot Configuration
-TELEGRAM_BOT_TOKEN = "8187667435:AAER2q-a06wXtHBCLAGND-X76Q6A85yT6wk"
+# Priority: 1. Environment variable, 2. Hardcoded fallback
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8187667435:AAER2q-a06wXtHBCLAGND-X76Q6A85yT6wk")
 
 # Gemini API Configuration
-GEMINI_API_KEY = "AIzaSyC1DRSmrGVvxMzARHhsLWTqiwpSVPLEOmI"
+# Priority: 1. Environment variable, 2. Hardcoded fallback
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyB8EG93ctLYzuu2J07TtilNEX4L1BWVOW8")
 GEMINI_MODEL = "gemini-flash-lite-latest"  # Gemini Flash-Lite Latest with Google Search grounding
 GOOGLE_SEARCH_RETRIEVAL = True  # Enable Google Search grounding
 
 # Google Maps API Configuration
-GOOGLE_MAPS_API_KEY = "AIzaSyDE9Rj-dBn6LtDCQxGrhVO--uuzl90QpvQ"
+# Priority: 1. Environment variable, 2. Hardcoded fallback
+GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY", "AIzaSyDE9Rj-dBn6LtDCQxGrhVO--uuzl90QpvQ")
 
 # Bot Settings
 BOT_USERNAME = "@ai_governance_bot"

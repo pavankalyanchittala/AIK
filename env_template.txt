@@ -1,0 +1,6 @@
+# Copy this entire content to a new file named ".env" in your project root
+
+TELEGRAM_BOT_TOKEN=8187667435:AAER2q-a06wXtHBCLAGND-X76Q6A85yT6wk
+GEMINI_API_KEY=AIzaSyB8EG93ctLYzuu2J07TtilNEX4L1BWVOW8
+GOOGLE_MAPS_API_KEY=AIzaSyDE9Rj-dBn6LtDCQxGrhVO--uuzl90QpvQ
+

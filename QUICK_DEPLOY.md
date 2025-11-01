@@ -62,11 +62,25 @@ git push -u origin main
    Instance Type: Free
    ```
 
-6. **Click "Create Background Worker"**
+6. **Add Environment Variables** (IMPORTANT! ⚠️):
+   
+   Before creating the service, scroll down to "Environment Variables" section and add these **3 variables**:
+   
+   Click "Add Environment Variable" for each:
+   
+   | Variable Name | Value |
+   |---------------|-------|
+   | `TELEGRAM_BOT_TOKEN` | `8187667435:AAER2q-a06wXtHBCLAGND-X76Q6A85yT6wk` |
+   | `GEMINI_API_KEY` | `AIzaSyB8EG93ctLYzuu2J07TtilNEX4L1BWVOW8` |
+   | `GOOGLE_MAPS_API_KEY` | `AIzaSyDE9Rj-dBn6LtDCQxGrhVO--uuzl90QpvQ` |
+   
+   ⚠️ **Note**: Copy-paste EXACTLY (no quotes, no spaces around =)
 
-7. **Wait 2-3 minutes** for deployment
+7. **Click "Create Background Worker"**
 
-8. **Check Logs**:
+8. **Wait 2-3 minutes** for deployment
+
+9. **Check Logs**:
    - You should see:
    ```
    ✅ Gemini model with Google Search initialized successfully
