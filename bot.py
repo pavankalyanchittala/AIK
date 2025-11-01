@@ -11,7 +11,7 @@ from google import genai
 from google.genai import types
 from io import BytesIO
 import config
-from pdf_generator import create_complaint_pdf, create_fir_pdf
+from pdf_generator import create_complaint_pdf
 
 # Configure logging
 logging.basicConfig(
@@ -26,10 +26,6 @@ client = genai.Client(api_key=config.GEMINI_API_KEY)
 # Conversation states for complaint filling
 COMPLAINT_NAME, COMPLAINT_FATHER_NAME, COMPLAINT_AGE, COMPLAINT_PHONE, COMPLAINT_EMAIL, COMPLAINT_ADDRESS = range(6)
 COMPLAINT_INITIAL_DESC, COMPLAINT_TYPE, COMPLAINT_DATE, COMPLAINT_LOCATION, COMPLAINT_DESCRIPTION = range(6, 11)
-
-# Conversation states for FIR filling
-FIR_NAME, FIR_FATHER_NAME, FIR_AGE, FIR_OCCUPATION, FIR_PHONE, FIR_ADDRESS = range(20, 26)
-FIR_CRIME_TYPE, FIR_DATETIME, FIR_LOCATION, FIR_ACCUSED, FIR_DESCRIPTION = range(26, 31)
 
 
 class KakinadaLegalBot:
@@ -191,15 +187,13 @@ I'm your AI-powered legal assistant for Kakinada and India.
 📚 Legal Information & Advice
 ⚖️ Indian Laws & Rights
 🏛️ Government Schemes
-📝 Complaint Filing
-🚔 FIR Filing Guidance
+📝 Complaint/Report Filing (All Types)
 📍 Police Station Locations
 🔍 Document Analysis
 
 *Quick Commands:*
 /help - All commands
-/complaint - File complaint
-/fir - File FIR
+/complaint - File complaint/report
 /police - Police stations
 
 💬 Ask me anything legal!
@@ -208,8 +202,7 @@ I'm your AI-powered legal assistant for Kakinada and India.
 Choose an option below or ask your question! 👇"""
     
     keyboard = [
-        [InlineKeyboardButton("📝 File Complaint", callback_data='start_complaint'),
-         InlineKeyboardButton("🚔 File FIR", callback_data='start_fir')],
+        [InlineKeyboardButton("📝 File Complaint/Report", callback_data='start_complaint')],
         [InlineKeyboardButton("📍 Police Stations", callback_data='police_stations')],
         [InlineKeyboardButton("🏛️ Government Schemes", callback_data='gov_schemes'),
          InlineKeyboardButton("⚖️ Legal Info", callback_data='legal_info')],
@@ -231,8 +224,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 *Commands:*
 /start - Start the bot
 /help - Show this help message
-/complaint - Start complaint filing
-/fir - Start FIR filing
+/complaint - File complaint/report (all types)
 /police - Police stations info
 /schemes - Government schemes
 /laws - Legal information
@@ -241,8 +233,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 *What I Can Do:*
 ✅ Answer legal questions (Latest info)
 ✅ Explain Indian laws (Up-to-date)
-✅ Help with complaint filing
-✅ Guide FIR procedures
+✅ Help with complaint/report filing (all types)
 ✅ Find police stations (Real-time)
 ✅ Explain government schemes (Current)
 ✅ Analyze documents & images
@@ -436,9 +427,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     
     if query.data == 'start_complaint':
-        await query.message.reply_text("📝 Starting complaint filing process...\n\nUse /complaint command to begin")
-    elif query.data == 'start_fir':
-        await query.message.reply_text("🚔 Starting FIR filing process...\n\nUse /fir command to begin")
+        await query.message.reply_text("📝 Starting complaint/report filing process...\n\nUse /complaint command to begin")
     elif query.data == 'police_stations':
         await legal_bot.send_police_stations_callback(query)
     elif query.data == 'gov_schemes':
@@ -951,232 +940,6 @@ To find your nearest police station, search online or dial 100 for police assist
     return ConversationHandler.END
 
 
-# FIR filing conversation handlers
-async def fir_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Start FIR filing"""
-    await update.message.reply_text(
-        "🚔 *FIR Filing Assistant*\n\n"
-        "I'll help you prepare an FIR draft. This is a serious legal document.\n\n"
-        "⚠️ *Important:*\n"
-        "- File FIR for cognizable offenses (serious crimes)\n"
-        "- For emergency, call 100 immediately\n"
-        "- This is a draft for your reference\n\n"
-        "Let's start with your details:\n\n"
-        "*What is your full name?*",
-        parse_mode='Markdown'
-    )
-    context.user_data['fir'] = {}
-    return FIR_NAME
-
-
-async def fir_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Get informant name"""
-    context.user_data['fir']['name'] = update.message.text
-    await update.message.reply_text("*What is your Father's/Husband's name?*", parse_mode='Markdown')
-    return FIR_FATHER_NAME
-
-
-async def fir_father_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Get father's name"""
-    context.user_data['fir']['father_name'] = update.message.text
-    await update.message.reply_text("*What is your age?*", parse_mode='Markdown')
-    return FIR_AGE
-
-
-async def fir_age(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Get age"""
-    context.user_data['fir']['age'] = update.message.text
-    await update.message.reply_text("*What is your occupation?*", parse_mode='Markdown')
-    return FIR_OCCUPATION
-
-
-async def fir_occupation(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Get occupation"""
-    context.user_data['fir']['occupation'] = update.message.text
-    await update.message.reply_text("*What is your phone number?*", parse_mode='Markdown')
-    return FIR_PHONE
-
-
-async def fir_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Get phone number"""
-    context.user_data['fir']['phone'] = update.message.text
-    await update.message.reply_text("*What is your complete address?*", parse_mode='Markdown')
-    return FIR_ADDRESS
-
-
-async def fir_address(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Get address"""
-    context.user_data['fir']['address'] = update.message.text
-    await update.message.reply_text(
-        "*What type of crime occurred?*\n\n"
-        "Examples: Theft, Assault, Robbery, Fraud, Murder, etc.",
-        parse_mode='Markdown'
-    )
-    return FIR_CRIME_TYPE
-
-
-async def fir_crime_type(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Get crime type"""
-    context.user_data['fir']['crime_type'] = update.message.text
-    await update.message.reply_text("*When did the crime occur? (Date and exact time if possible)*", parse_mode='Markdown')
-    return FIR_DATETIME
-
-
-async def fir_datetime(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Get crime datetime"""
-    context.user_data['fir']['incident_datetime'] = update.message.text
-    await update.message.reply_text(
-        "*Where did the crime occur? (Exact location/address)*\n\n"
-        "Include: Area/Landmark, City/Village, Mandal, District\n\n"
-        "Example: 'Near Bus Stand, Vijayawada, Vijayawada Mandal, Krishna District'",
-        parse_mode='Markdown'
-    )
-    return FIR_LOCATION
-
-
-async def fir_location(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Get crime location"""
-    context.user_data['fir']['incident_location'] = update.message.text
-    await update.message.reply_text(
-        "*Do you know the accused person(s)?*\n\n"
-        "Provide details if known (name, address, description), or type 'unknown'",
-        parse_mode='Markdown'
-    )
-    return FIR_ACCUSED
-
-
-async def fir_accused(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Get accused details"""
-    context.user_data['fir']['accused_details'] = update.message.text
-    await update.message.reply_text(
-        "*Please provide a detailed description of the crime:*\n\n"
-        "Include complete sequence of events, how it happened, witnesses, evidence, etc.",
-        parse_mode='Markdown'
-    )
-    return FIR_DESCRIPTION
-
-
-async def fir_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Get description and generate FIR PDF"""
-    context.user_data['fir']['description'] = update.message.text
-    
-    await update.message.reply_text("⏳ Processing your FIR draft... Please wait.\n🤖 Analyzing crime details...")
-    
-    fir_data = context.user_data['fir']
-    crime_type = fir_data['crime_type']
-    description = fir_data['description']
-    address = fir_data['address']
-    incident_location = fir_data['incident_location']
-    
-    # Get applicable laws (includes description analysis)
-    applicable_laws = legal_bot.get_applicable_laws(crime_type, description)
-    fir_data['applicable_laws'] = applicable_laws
-    
-    # Use Google Search to find nearest police stations
-    await update.message.reply_text("🔍 Searching for nearest police stations with jurisdiction...")
-    
-    try:
-        user_id = update.message.from_user.id
-        
-        # Search for police stations
-        police_search_prompt = f"""Search Google for police station with jurisdiction for this FIR:
-
-Crime Location: {incident_location}
-Accused Address: {address}
-Crime Type: {crime_type}
-
-Provide ONLY in this clean format:
-
-**Police Station Name**
-📍 Address: [Full address with mandal, district, pincode]
-📞 Phone: [Contact number]  
-✅ Jurisdiction: [Covers this area for {crime_type}]
-⚠️ Special Unit: [If applicable - Cyber Cell, Women's Cell, etc.]
-
-Keep it SHORT and FACTUAL. No explanations."""
-
-        police_response = legal_bot.send_message(user_id, police_search_prompt)
-        
-        fir_data['police_station'] = police_response
-        police_info_text = police_response
-        
-    except Exception as e:
-        logger.error(f"Error searching for police stations: {e}")
-        fir_data['police_station'] = f"Police Station with jurisdiction in {incident_location}"
-        police_info_text = f"Visit nearest police station in {incident_location} (Emergency: 100)"
-    
-    # Generate PDF
-    try:
-        filename = f"fir_draft_{update.message.from_user.id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
-        pdf_path = create_fir_pdf(fir_data, filename)
-        
-        # Determine crime analysis
-        crime_analysis = "theft" if any(word in (crime_type + " " + description).lower() for word in ['mobile', 'phone', 'theft', 'stolen']) else crime_type
-        
-        # Send summary with location awareness
-        if user_city and user_city['city'].lower() != 'kakinada':
-            location_notice = f"""
-⚠️ *Location Notice:*
-You're from {user_city['city']}. 
-
-🚨 *Urgent: Contact {user_city['city']} Police Immediately:*
-📞 Control Room: {user_city['police_control']}
-🆘 Emergency: {user_city['helpline']}
-
-Visit the nearest police station in {user_city['city']} to file FIR.
-"""
-        else:
-            location_notice = f"""
-*Police Contact:*
-{police_info_text}
-"""
-        
-        summary = f"""
-✅ *FIR Draft Generated Successfully!*
-
-*Crime Details:*
-👤 Informant: {fir_data['name']}
-📍 Location: {incident_location}
-🔴 Crime Type: {crime_type}
-🔍 Analysis: This appears to be a *{crime_analysis}* case
-
-*Applicable Laws:*
-{applicable_laws}
-
-{location_notice}
-
-⚠️ *Next Steps:*
-1. Visit the police station *immediately*
-2. Carry this draft and all evidence
-3. Police will record your official FIR
-4. Get a copy of the registered FIR
-5. Note down the FIR number
-6. For serious crimes, call 100 now!
-"""
-        
-        await update.message.reply_text(summary, parse_mode='Markdown')
-        
-        # Send PDF
-        with open(pdf_path, 'rb') as pdf_file:
-            await update.message.reply_document(
-                document=pdf_file,
-                filename=filename,
-                caption="📄 Your FIR draft is ready!\n\n"
-                        "⚠️ IMPORTANT: This is a DRAFT for reference.\n"
-                        "Visit the police station to file the official FIR.\n"
-                        "🚨 For emergency, call 100 or 112 immediately!"
-            )
-        
-        # Clean up
-        os.remove(pdf_path)
-        
-    except Exception as e:
-        logger.error(f"Error generating FIR PDF: {e}")
-        await update.message.reply_text("❌ Sorry, there was an error generating the PDF. Please try again.")
-    
-    return ConversationHandler.END
-
-
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Cancel current operation"""
     await update.message.reply_text(
@@ -1323,8 +1086,7 @@ Instructions:
             "I apologize, I'm having trouble processing your request. "
             "Please try rephrasing or use one of the commands:\n"
             "/help - Show available commands\n"
-            "/complaint - File a complaint\n"
-            "/fir - File an FIR\n"
+            "/complaint - File complaint/report\n"
             "/police - Find police stations"
         )
 
@@ -1428,26 +1190,6 @@ def main():
         fallbacks=[CommandHandler("cancel", cancel)],
     )
     application.add_handler(complaint_handler)
-    
-    # FIR filing conversation
-    fir_handler = ConversationHandler(
-        entry_points=[CommandHandler("fir", fir_start)],
-        states={
-            FIR_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, fir_name)],
-            FIR_FATHER_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, fir_father_name)],
-            FIR_AGE: [MessageHandler(filters.TEXT & ~filters.COMMAND, fir_age)],
-            FIR_OCCUPATION: [MessageHandler(filters.TEXT & ~filters.COMMAND, fir_occupation)],
-            FIR_PHONE: [MessageHandler(filters.TEXT & ~filters.COMMAND, fir_phone)],
-            FIR_ADDRESS: [MessageHandler(filters.TEXT & ~filters.COMMAND, fir_address)],
-            FIR_CRIME_TYPE: [MessageHandler(filters.TEXT & ~filters.COMMAND, fir_crime_type)],
-            FIR_DATETIME: [MessageHandler(filters.TEXT & ~filters.COMMAND, fir_datetime)],
-            FIR_LOCATION: [MessageHandler(filters.TEXT & ~filters.COMMAND, fir_location)],
-            FIR_ACCUSED: [MessageHandler(filters.TEXT & ~filters.COMMAND, fir_accused)],
-            FIR_DESCRIPTION: [MessageHandler(filters.TEXT & ~filters.COMMAND, fir_description)],
-        },
-        fallbacks=[CommandHandler("cancel", cancel)],
-    )
-    application.add_handler(fir_handler)
     
     # Add message handlers
     application.add_handler(MessageHandler(filters.PHOTO, handle_photo))

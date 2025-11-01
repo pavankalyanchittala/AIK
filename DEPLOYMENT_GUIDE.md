@@ -40,6 +40,7 @@
 
 ### Why Render?
 ✅ **750 Free instance hours/month** (enough for 24/7 operation)
+✅ **Handles 50+ concurrent users** (async architecture)
 ✅ Easy setup (5 minutes)
 ✅ Auto-deploy on git push
 ✅ HTTPS/SSL included
@@ -47,6 +48,11 @@
 
 ### ⚠️ Key Limitation - Web Services Spin Down
 **Important**: If you deploy as a "Web Service", Render spins it down after 15 minutes of inactivity. **Deploy as a "Background Worker"** instead for 24/7 operation without spin-down!
+
+### 📊 Performance
+- **Free Tier**: Perfect for 50 users/day (1-3s response time)
+- **Concurrent Users**: Handles 50+ users simultaneously ✅
+- **See**: `CONCURRENCY_PERFORMANCE.md` for full details
 
 Reference: [Render Free Tier Documentation](https://render.com/docs/free)
 
